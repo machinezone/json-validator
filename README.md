@@ -11,41 +11,43 @@ A Java library that puts together a basic implementation of JSON codec and a gen
 - Encoding and decoding obey common approaches like transient fields and has local-threaded optimization
 
 ## Example
-    @SuppressWarnings({"InstanceVariableMayNotBeInitialized", "unused"})
-    public class ResponseError extends AbstractCheckableObject {
-        // Allowed rules: ANY, NULL_OR_CHECKABLE, NOT_NULL, ZERO,
-        // NON_NEGATIVE_INTEGER, POSITIVE_INTEGER, NON_EMPTY_STRING, TRUE, FALSE
-        @CheckRule(NON_EMPTY_STRING)
-        @SerializedName("reason")
-        private String reason;
+```java
+@SuppressWarnings({"InstanceVariableMayNotBeInitialized", "unused"})
+public class ResponseError extends AbstractCheckableObject {
+    // Allowed rules: ANY, NULL_OR_CHECKABLE, NOT_NULL, ZERO,
+    // NON_NEGATIVE_INTEGER, POSITIVE_INTEGER, NON_EMPTY_STRING, TRUE, FALSE
+    @CheckRule(NON_EMPTY_STRING)
+    @SerializedName("reason")
+    private String reason;
 
-        @CheckRule(POSITIVE_INTEGER)
-        @SerializedName("code")
-        private Integer code;
+    @CheckRule(POSITIVE_INTEGER)
+    @SerializedName("code")
+    private Integer code;
+}
+
+// Allowed parents: AbstractCheckableMap, AbstractCheckableList, AbstractCheckableKeyValuePair
+class ResponseErrors extends AbstractCheckableList<ResponseError> {}
+
+public class Response extends AbstractCheckableObject {
+    @CheckRule(NULL_OR_CHECKABLE)
+    @SerializedName("errors")
+    private ResponseErrors errors;
+}
+
+public class ResponseTest {
+    @Rule
+    public final ExpectedException e = ExpectedException.none();
+
+    @Test
+    public void testInvalidModel() throws Exception {
+        e.expect(CheckException.class);
+        e.expectMessage("Property 'errors.1.reason' of " +
+                "com.mz.json.examples.model.Response{errors=[{reason=x, code=666}, {reason=, code=null}]} " +
+                "is an empty string");
+        decodeModel("{errors: [{reason: \"x\", code: 666}, {reason: \"\"}]}", Response.class);
     }
-
-    // Allowed parents: AbstractCheckableMap, AbstractCheckableList, AbstractCheckableKeyValuePair
-    class ResponseErrors extends AbstractCheckableList<ResponseError> {}
-
-    public class Response extends AbstractCheckableObject {
-        @CheckRule(NULL_OR_CHECKABLE)
-        @SerializedName("errors")
-        private ResponseErrors errors;
-    }
-
-    public class ResponseTest {
-        @Rule
-        public final ExpectedException e = ExpectedException.none();
-
-        @Test
-        public void testInvalidModel() throws Exception {
-            e.expect(CheckException.class);
-            e.expectMessage("Property 'errors.1.reason' of " +
-                    "com.mz.json.examples.model.Response{errors=[{reason=x, code=666}, {reason=, code=null}]} " +
-                    "is an empty string");
-            decodeModel("{errors: [{reason: \"x\", code: 666}, {reason: \"\"}]}", Response.class);
-        }
-    }
+}
+```
 
 ## More examples
 * [Complex Model](src/test/java/com/mz/json/examples/ComplexResponseTest.java)
