@@ -5,12 +5,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.assertEquals;
 
-public class AbstractCheckableMapTest {
-    private static final String CLASS_NAME = "com.mz.json.validator.AbstractCheckableMapTest";
+public class CheckableMapTest {
+    private static final String CLASS_NAME = "com.mz.json.validator.CheckableMapTest";
 
-    private class TestCheckableMap extends AbstractCheckableMap<String,StringProp> {
+    private class TestCheckableMap extends HashMap<String, StringProp>
+            implements CheckableMap<String, StringProp> {
     }
 
     @Rule

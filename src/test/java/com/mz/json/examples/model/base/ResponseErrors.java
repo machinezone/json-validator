@@ -1,6 +1,8 @@
 package com.mz.json.examples.model.base;
 
-import com.mz.json.validator.AbstractCheckableList;
+import com.mz.json.validator.CheckableList;
 
-// Allowed parents: AbstractCheckableMap, AbstractCheckableList, AbstractCheckableKeyValuePair
-public class ResponseErrors extends AbstractCheckableList<ResponseError> {}
+import java.util.ArrayList;
+
+// Allowed parents: CheckableMap, CheckableList, CheckableKeyValuePair
+public class ResponseErrors extends ArrayList<ResponseError> implements CheckableList<ResponseError> {}

@@ -1,13 +1,14 @@
 package com.mz.json.examples.model.complex;
 
 import com.google.gson.annotations.SerializedName;
-import com.mz.json.validator.AbstractCheckableObject;
+import com.mz.json.validator.CheckableObject;
 import com.mz.json.validator.CheckRule;
+import com.mz.json.validator.StringRepresentation;
 
 import static com.mz.json.validator.CheckType.*;
 
 @SuppressWarnings({"InstanceVariableMayNotBeInitialized", "unused"})
-public class Shard extends AbstractCheckableObject {
+public class Shard implements CheckableObject {
     @CheckRule(NON_NEGATIVE_INTEGER)
     @SerializedName("records-updated")
     public int recordsUpdated;
@@ -27,4 +28,9 @@ public class Shard extends AbstractCheckableObject {
     @CheckRule(ANY)
     @SerializedName("mixed")
     public Object mixed;
+
+    @Override
+    public String toString() {
+        return StringRepresentation.toString(this);
+    }
 }

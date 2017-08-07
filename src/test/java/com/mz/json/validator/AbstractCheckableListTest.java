@@ -5,12 +5,14 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.ArrayList;
+
 import static org.junit.Assert.assertEquals;
 
-public class AbstractCheckableListTest {
-    private static final String CLASS_NAME = "com.mz.json.validator.AbstractCheckableListTest";
+public class CheckableListTest {
+    private static final String CLASS_NAME = "com.mz.json.validator.CheckableListTest";
 
-    private class TestCheckableList extends AbstractCheckableList<StringProp> {
+    private class TestCheckableList extends ArrayList<StringProp> implements CheckableList<StringProp> {
     }
 
     @Rule

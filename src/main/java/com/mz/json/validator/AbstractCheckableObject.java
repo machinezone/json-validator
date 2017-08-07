@@ -4,30 +4,64 @@ import com.google.gson.annotations.SerializedName;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
-import java.util.*;
+import java.util.Map;
 
-import static com.mz.json.validator.CheckType.ANY;
-import static com.mz.json.validator.CheckType.NULL_OR_CHECKABLE;
-import static com.mz.json.validator.PropertyPath.getEmptyPropertyPath;
+import static com.mz.json.validator.CheckType.*;
 
-@SuppressWarnings("AbstractClassWithoutAbstractMethods")
-public abstract class AbstractCheckableObject extends PrintableObject
-        implements ComplexCheckable, SimpleCheckable {
+final class Checker {
 
-    private static final transient Set<CheckType> COMPATIBLE_WITH_CHECKABLE = new HashSet<>(
-            Arrays.asList(ANY, NULL_OR_CHECKABLE));
-
-    @Override
-    public void check() throws CheckException {
-        check(this, getEmptyPropertyPath());
+    static <T extends ComplexCheckable> void checkList(
+            CheckableList<T> list,
+            ComplexCheckable complexCheckable,
+            PropertyPath propertyPath)
+            throws CheckException {
+        int index = 0;
+        for (T item : list) {
+            PropertyPath itemPropertyPath = propertyPath.getAppendedInstance(String.valueOf(index));
+            NOT_NULL.check(complexCheckable, itemPropertyPath, item);
+            item.check(complexCheckable, itemPropertyPath);
+            index++;
+        }
     }
 
-    @Override
-    public void check(ComplexCheckable complexCheckable, PropertyPath propertyPath) throws CheckException {
+    static <K, V extends ComplexCheckable> void checkMap(
+            CheckableMap<K, V> map,
+            ComplexCheckable complexCheckable,
+            PropertyPath propertyPath)
+            throws CheckException {
+        for (Map.Entry<K, V> entry : map.entrySet()) {
+            PropertyPath entryPropertyPath = propertyPath.getAppendedInstance(entry.getKey().toString());
+            NOT_NULL.check(complexCheckable, entryPropertyPath, entry.getValue());
+            entry.getValue().check(complexCheckable, entryPropertyPath);
+        }
+    }
+
+    static <V> void checkKeyValuePair(
+            CheckableKeyValuePair<V> kv,
+            ComplexCheckable complexCheckable,
+            PropertyPath propertyPath)
+            throws CheckException {
+        String key = (String) kv.keySet().toArray()[0];
+        V value = kv.get(key);
+
+        NON_EMPTY_STRING.check(complexCheckable, propertyPath.getAppendedInstance("$key"), key);
+        if (value instanceof ComplexCheckable) {
+            ((ComplexCheckable) value).check(complexCheckable, propertyPath.getAppendedInstance(key));
+        } else {
+            NOT_NULL.check(complexCheckable, propertyPath.getAppendedInstance(key), value);
+        }
+
+    }
+
+    static void checkObject(
+            CheckableObject obj,
+            ComplexCheckable complexCheckable,
+            PropertyPath propertyPath)
+            throws CheckException {
         int checkedFieldsCount = 0;
 
-        Class<?> currentClass = getClass();
-        while ((currentClass != null) && (currentClass != AbstractCheckableObject.class)) {
+        Class<?> currentClass = obj.getClass();
+        while ((currentClass != null) && (currentClass != CheckableObject.class)) {
             Field[] fields = currentClass.getDeclaredFields();
             for (Field field : fields) {
                 if (Modifier.isTransient(field.getModifiers())
@@ -43,7 +77,7 @@ public abstract class AbstractCheckableObject extends PrintableObject
                 }
                 final String fieldName = serializedNameAnn.value();
 
-                final Object object = getValue(field);
+                final Object object = StringRepresentation.getValue(obj, field);
                 boolean isComplexCheckable = object instanceof ComplexCheckable;
                 if (isComplexCheckable) {
                     ((ComplexCheckable) object).check(complexCheckable,
@@ -59,7 +93,7 @@ public abstract class AbstractCheckableObject extends PrintableObject
                     }
                 } else {
                     CheckType checkType = checkRuleAnnotation.value();
-                    if (isComplexCheckable && (!COMPATIBLE_WITH_CHECKABLE.contains(checkType))) {
+                    if (isComplexCheckable && (checkType != ANY) && (checkType != NULL_OR_CHECKABLE)) {
                         throw new PropertyCheckException(complexCheckable,
                                 propertyPath.getAppendedInstance(fieldName),
                                 "is inherited from 'ComplexCheckable' interface and also has 'CheckRule' annotation");
@@ -69,13 +103,14 @@ public abstract class AbstractCheckableObject extends PrintableObject
                     }
                 }
 
-                checkedFieldsCount += 1;
+                checkedFieldsCount++;
             }
             currentClass = currentClass.getSuperclass();
         }
         if (checkedFieldsCount < 1) {
             throw new CheckException(String.format("Class %s%s has no fields to check",
-                    getClass().getName(), complexCheckable));
+                    obj.getClass().getName(), complexCheckable));
         }
+
     }
 }

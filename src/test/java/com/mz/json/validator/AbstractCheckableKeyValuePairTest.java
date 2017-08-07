@@ -1,31 +1,37 @@
 package com.mz.json.validator;
 
+import com.mz.json.validator.model.PrintableCheckableObject;
 import com.mz.json.validator.model.StringProp;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import java.util.HashMap;
+
 import static org.junit.Assert.assertEquals;
 
-public class AbstractCheckableKeyValuePairTest {
-    private static final String CLASS_NAME = "com.mz.json.validator.AbstractCheckableKeyValuePairTest";
+public class CheckableKeyValuePairTest {
+    private static final String CLASS_NAME = "com.mz.json.validator.CheckableKeyValuePairTest";
 
-    private class StringCheckableKeyValuePair extends AbstractCheckableKeyValuePair<String> {
+    private class StringCheckableKeyValuePair extends HashMap<String, String>
+            implements com.mz.json.validator.CheckableKeyValuePair<String> {
         StringCheckableKeyValuePair(String key, String value) {
-            super(key, value);
+            put(key, value);
         }
     }
 
-    private class ObjectCheckableKeyValuePair extends AbstractCheckableKeyValuePair<Object> {
+    private class ObjectCheckableKeyValuePair extends HashMap<String, Object>
+            implements com.mz.json.validator.CheckableKeyValuePair<Object> {
         ObjectCheckableKeyValuePair(String key, Object value) {
-            super(key, value);
+            put(key, value);
         }
     }
 
     @SuppressWarnings("SameParameterValue")
-    private class CheckableKeyValuePair<T extends ComplexCheckable> extends AbstractCheckableKeyValuePair<T> {
+    private class CheckableKeyValuePair<T extends ComplexCheckable> extends HashMap<String, T>
+            implements com.mz.json.validator.CheckableKeyValuePair<T> {
         CheckableKeyValuePair(String key, T value) {
-            super(key, value);
+            put(key, value);
         }
     }
 
@@ -70,10 +76,10 @@ public class AbstractCheckableKeyValuePairTest {
 
     @Test
     public void testPairWithCheckableValue() throws Exception {
-        class NoFields extends AbstractCheckableObject {
+        class NoFields extends PrintableCheckableObject {
         }
 
-        CheckableKeyValuePair<NoFields> pair = new CheckableKeyValuePair<>("k", new NoFields());
+        CheckableKeyValuePair pair = new CheckableKeyValuePair("k", new NoFields());
 
         e.expect(CheckException.class);
         e.expectMessage("Class " + CLASS_NAME +
@@ -83,7 +89,7 @@ public class AbstractCheckableKeyValuePairTest {
 
     @Test
     public void testPairWithEmptyStringInCheckableValue() throws Exception {
-        CheckableKeyValuePair<StringProp> pair = new CheckableKeyValuePair<>("k", new StringProp(""));
+        CheckableKeyValuePair pair = new CheckableKeyValuePair("k", new StringProp(""));
 
         e.expect(CheckException.class);
         e.expectMessage("Property 'k.prop' of " + CLASS_NAME +
@@ -94,7 +100,7 @@ public class AbstractCheckableKeyValuePairTest {
     @Test
     public void testPairWithGoodStringProp() throws Exception {
         //noinspection MismatchedQueryAndUpdateOfCollection
-        CheckableKeyValuePair<StringProp> pair = new CheckableKeyValuePair<>("k", new StringProp("v"));
+        CheckableKeyValuePair pair = new CheckableKeyValuePair("k", new StringProp("v"));
 
         pair.check();
         assertEquals(pair.toString(), "{k={prop=v}}");

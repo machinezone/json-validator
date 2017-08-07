@@ -1,7 +1,9 @@
 package com.mz.json.examples.model.complex;
 
-import com.mz.json.validator.AbstractCheckableMap;
+import com.mz.json.validator.CheckableMap;
 
-public class Shards extends AbstractCheckableMap<String, Shard> {
+import java.util.HashMap;
+
+public class Shards extends HashMap<String, Shard> implements CheckableMap<String, Shard> {
 
 }
