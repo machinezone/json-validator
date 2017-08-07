@@ -2,6 +2,7 @@ package com.mz.json.validator;
 
 import com.google.gson.annotations.SerializedName;
 import com.mz.json.validator.model.ArrayOfStringProp;
+import com.mz.json.validator.model.PrintableCheckableObject;
 import com.mz.json.validator.model.StringProp;
 import org.junit.Rule;
 import org.junit.Test;
@@ -11,15 +12,15 @@ import static com.mz.json.validator.CheckType.*;
 import static org.junit.Assert.assertEquals;
 
 @SuppressWarnings("ClassWithTooManyMethods")
-public class AbstractCheckableObjectTest {
-    private static final String CLASS_NAME = "com.mz.json.validator.AbstractCheckableObjectTest";
+public class CheckableObjectTest {
+    private static final String CLASS_NAME = "com.mz.json.validator.CheckableObjectTest";
 
     @Rule
     public final ExpectedException e = ExpectedException.none();
 
     @Test
     public void testNoFields() throws Exception {
-        class NoFields extends AbstractCheckableObject {
+        class NoFields extends PrintableCheckableObject {
         }
 
         e.expect(CheckException.class);
@@ -31,7 +32,7 @@ public class AbstractCheckableObjectTest {
     @Test
     public void testNoSerializedName() throws Exception {
         @SuppressWarnings("InstanceVariableMayNotBeInitialized")
-        class NoSerializedName extends AbstractCheckableObject {
+        class NoSerializedName extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             private String prop;
         }
@@ -45,7 +46,7 @@ public class AbstractCheckableObjectTest {
     @Test
     public void testNotCheckableProp() throws Exception {
         @SuppressWarnings("InstanceVariableMayNotBeInitialized")
-        class NotCheckableProp extends AbstractCheckableObject {
+        class NotCheckableProp extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @SerializedName("prop_title")
             private String prop;
@@ -139,7 +140,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testEmptyStringPropInProp() throws Exception {
-        class EmptyStringPropInProp extends AbstractCheckableObject {
+        class EmptyStringPropInProp extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @SerializedName("prop")
             private final StringProp prop = new StringProp("");
@@ -153,7 +154,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testNullStringPropInProp() throws Exception {
-        class NullStringPropInProp extends AbstractCheckableObject {
+        class NullStringPropInProp extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @SerializedName("prop")
             private final StringProp prop = null;
@@ -168,7 +169,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testGoodStringPropInProp() throws Exception {
-        class GoodStringPropInProp extends AbstractCheckableObject {
+        class GoodStringPropInProp extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @SerializedName("prop")
             private final StringProp prop = new StringProp("string");
@@ -181,7 +182,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testGoodStringPropInPropWithCheckRule() throws Exception {
-        class GoodStringPropInPropWithCheckRule extends AbstractCheckableObject {
+        class GoodStringPropInPropWithCheckRule extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @CheckRule(NON_EMPTY_STRING)
             @SerializedName("prop")
@@ -205,7 +206,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testEmptyArrayOfStringPropInProp() throws Exception {
-        class EmptyArrayOfStringPropInProp extends AbstractCheckableObject {
+        class EmptyArrayOfStringPropInProp extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @SerializedName("prop")
             private final ArrayOfStringProp prop = new ArrayOfStringProp();
@@ -218,7 +219,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testArrayOfEmptyStringPropInProp() throws Exception {
-        final class ArrayOfEmptyStringPropInProp extends AbstractCheckableObject {
+        final class ArrayOfEmptyStringPropInProp extends PrintableCheckableObject {
             @SuppressWarnings({"unused", "MismatchedQueryAndUpdateOfCollection"})
             @SerializedName("prop")
             private final ArrayOfStringProp prop = new ArrayOfStringProp();
@@ -236,7 +237,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testArrayOfGoodStringPropInProp() throws Exception {
-        final class ArrayOfGoodStringPropInProp extends AbstractCheckableObject {
+        final class ArrayOfGoodStringPropInProp extends PrintableCheckableObject {
             @SuppressWarnings({"unused", "MismatchedQueryAndUpdateOfCollection"})
             @SerializedName("prop")
             private final ArrayOfStringProp prop = new ArrayOfStringProp();
@@ -253,7 +254,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testNullOrCheckableWithNull() throws Exception {
-        final class NullOrCheckableWithNull extends AbstractCheckableObject {
+        final class NullOrCheckableWithNull extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @CheckRule(NULL_OR_CHECKABLE)
             @SerializedName("prop2")
@@ -267,7 +268,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testNullOrCheckableWithNotCheckable() throws Exception {
-        final class NullOrCheckableWithNotCheckable extends AbstractCheckableObject {
+        final class NullOrCheckableWithNotCheckable extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @CheckRule(NULL_OR_CHECKABLE)
             @SerializedName("prop2")
@@ -283,7 +284,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testNullOrCheckableWithCheckable() throws Exception {
-        final class NullOrCheckableWithCheckable extends AbstractCheckableObject {
+        final class NullOrCheckableWithCheckable extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @CheckRule(NULL_OR_CHECKABLE)
             @SerializedName("prop2")
@@ -297,7 +298,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testAnyWithNull() throws Exception {
-        final class AnyWithNull extends AbstractCheckableObject {
+        final class AnyWithNull extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @CheckRule(ANY)
             @SerializedName("prop2")
@@ -311,7 +312,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testAnyWithNotCheckable() throws Exception {
-        final class AnyWithNotCheckable extends AbstractCheckableObject {
+        final class AnyWithNotCheckable extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @CheckRule(ANY)
             @SerializedName("prop2")
@@ -325,7 +326,7 @@ public class AbstractCheckableObjectTest {
 
     @Test
     public void testAnyWithCheckable() throws Exception {
-        final class AnyWithCheckable extends AbstractCheckableObject {
+        final class AnyWithCheckable extends PrintableCheckableObject {
             @SuppressWarnings({"unused"})
             @CheckRule(ANY)
             @SerializedName("prop2")

@@ -1,9 +1,9 @@
 package com.mz.json.helpers;
 
 import com.google.gson.annotations.SerializedName;
-import com.mz.json.validator.AbstractCheckableObject;
 import com.mz.json.validator.CheckException;
 import com.mz.json.validator.CheckRule;
+import com.mz.json.validator.model.PrintableCheckableObject;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -14,7 +14,7 @@ import static com.mz.json.validator.CheckType.NON_EMPTY_STRING;
 import static org.junit.Assert.assertEquals;
 
 public class ModelCoDecTest {
-    class TestModel extends AbstractCheckableObject {
+    class TestModel extends PrintableCheckableObject {
         static final transient String CLASS_NAME = "com.mz.json.helpers.ModelCoDecTest$TestModel";
 
         @SuppressWarnings("unused")

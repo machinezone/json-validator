@@ -1,0 +1,57 @@
+***************
+*** 12,18 ****
+  
+  ## Example
+      @SuppressWarnings({"InstanceVariableMayNotBeInitialized", "unused"})
+-     public class ResponseError extends AbstractCheckableObject {
+          // Allowed rules: ANY, NULL_OR_CHECKABLE, NOT_NULL, ZERO,
+          // NON_NEGATIVE_INTEGER, POSITIVE_INTEGER, NON_EMPTY_STRING, TRUE, FALSE
+          @CheckRule(NON_EMPTY_STRING)
+--- 12,18 ----
+  
+  ## Example
+      @SuppressWarnings({"InstanceVariableMayNotBeInitialized", "unused"})
++     public class ResponseError extends PrintableObject implements CheckableObject {
+          // Allowed rules: ANY, NULL_OR_CHECKABLE, NOT_NULL, ZERO,
+          // NON_NEGATIVE_INTEGER, POSITIVE_INTEGER, NON_EMPTY_STRING, TRUE, FALSE
+          @CheckRule(NON_EMPTY_STRING)
+***************
+*** 24,33 ****
+          private Integer code;
+      }
+  
+-     // Allowed parents: AbstractCheckableMap, AbstractCheckableList, AbstractCheckableKeyValuePair
+-     class ResponseErrors extends AbstractCheckableList<ResponseError> {}
+  
+-     public class Response extends AbstractCheckableObject {
+          @CheckRule(NULL_OR_CHECKABLE)
+          @SerializedName("errors")
+          private ResponseErrors errors;
+--- 24,33 ----
+          private Integer code;
+      }
+  
++     // Allowed interfaces: CheckableMap, CheckableList, CheckableKeyValuePair
++     class ResponseErrors extends ArrayList<ResponseError> implements CheckableList<ResponseError> {}
+  
++     public class Response extends PrintableObject implements CheckableObject {
+          @CheckRule(NULL_OR_CHECKABLE)
+          @SerializedName("errors")
+          private ResponseErrors errors;
+***************
+*** 41,47 ****
+          public void testInvalidModel() throws Exception {
+              e.expect(CheckException.class);
+              e.expectMessage("Property 'errors.1.reason' of " +
+-                     "com.mz.json.examples.model.Response{errors=[{reason=x, code=666}, {reason=, code=null}]} " +
+                      "is an empty string");
+              decodeModel("{errors: [{reason: \"x\", code: 666}, {reason: \"\"}]}", Response.class);
+          }
+--- 41,47 ----
+          public void testInvalidModel() throws Exception {
+              e.expect(CheckException.class);
+              e.expectMessage("Property 'errors.1.reason' of " +
++                     "Response{errors=[{reason=x, code=666}, {reason=, code=null}]} " +
+                      "is an empty string");
+              decodeModel("{errors: [{reason: \"x\", code: 666}, {reason: \"\"}]}", Response.class);
+          }
